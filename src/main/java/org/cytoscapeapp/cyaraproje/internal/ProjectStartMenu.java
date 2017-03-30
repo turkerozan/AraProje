@@ -27,6 +27,7 @@ import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscapeapp.cyaraproje.internal.clustering.EdgeRemoval;
 import org.cytoscapeapp.cyaraproje.internal.cycle.ConnectedComponents;
+import org.cytoscapeapp.cyaraproje.internal.spanningtree.ClearView;
 import org.cytoscapeapp.cyaraproje.internal.spanningtree.CreateTableTask;
 import org.cytoscapeapp.cyaraproje.internal.spanningtree.MainThread;
 import org.cytoscapeapp.cyaraproje.internal.visuals.ChangeEdgeAttributeListener;
@@ -45,6 +46,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     public static final String DEFAULT_WEIGHT_ATTRIBUTE = "DefaultWeightTakenAsOne";
  
     public MainThread pTreeThread1;
+    public ClearView clearAll;
     public CreateTableTask createTable;
     public EdgeRemoval edgeRemovalThread;
 
@@ -75,12 +77,13 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         jPanel2 = new javax.swing.JPanel();
         jSeparator1 = new javax.swing.JSeparator();
         jPanel3 = new javax.swing.JPanel();
-        minRadioButton = new javax.swing.JRadioButton();
         jButton1 = new javax.swing.JButton();
         jTextField1 = new javax.swing.JTextField();
         jTextField2 = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
+        viewCheckBox = new javax.swing.JCheckBox();
+        jButton2 = new javax.swing.JButton();
         jPanel4 = new javax.swing.JPanel();
         statusBar = new javax.swing.JProgressBar();
         statusLabel = new javax.swing.JLabel();
@@ -111,10 +114,6 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
 
         jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder("Options"));
 
-        buttonGroup2.add(minRadioButton);
-        minRadioButton.setText("View Infection step by step");
-        minRadioButton.setMultiClickThreshhold(1L);
-
         jButton1.setText("Start");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -128,26 +127,39 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
 
         jLabel1.setText("Infection Rate");
 
-        jLabel4.setText("StepSize");
+        jLabel4.setText("f value");
         jLabel4.setToolTipText("");
+
+        viewCheckBox.setText("View Infection step by step");
+
+        jButton2.setText("Clear");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel3Layout.createSequentialGroup()
-                .add(minRadioButton)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jButton1))
-            .add(jPanel3Layout.createSequentialGroup()
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jLabel1)
-                    .add(jLabel4))
-                .add(30, 30, 30)
-                .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                    .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jTextField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .add(jPanel3Layout.createSequentialGroup()
+                        .add(viewCheckBox)
+                        .add(18, 18, 18)
+                        .add(jButton1)
+                        .add(18, 18, 18)
+                        .add(jButton2))
+                    .add(jPanel3Layout.createSequentialGroup()
+                        .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jLabel1)
+                            .add(jLabel4))
+                        .add(30, 30, 30)
+                        .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .add(jTextField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                .addContainerGap(66, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -156,14 +168,15 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel1))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 41, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jTextField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel4))
-                .add(9, 9, 9)
+                    .add(jLabel4)
+                    .add(jTextField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 50, Short.MAX_VALUE)
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(minRadioButton, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 23, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jButton1)))
+                    .add(jButton1)
+                    .add(viewCheckBox)
+                    .add(jButton2)))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Status bar"));
@@ -363,7 +376,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                 .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabel2)
                     .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(31, Short.MAX_VALUE))
+                .addContainerGap(22, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -372,7 +385,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                 .add(jLabel2)
                 .add(18, 18, 18)
                 .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addContainerGap(34, Short.MAX_VALUE))
+                .addContainerGap(28, Short.MAX_VALUE))
         );
 
         jScrollPane1.setViewportView(jPanel5);
@@ -382,8 +395,9 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         layout.setHorizontalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(layout.createSequentialGroup()
-                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 356, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .add(0, 580, Short.MAX_VALUE))
+                .addContainerGap()
+                .add(jScrollPane1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 447, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap(479, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -459,9 +473,17 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         edgeWeightAttribute = inputEdgeAttributeAndValidate(currentnetwork.getDefaultEdgeTable());
         double q = Double.parseDouble(jTextField1.getText());
         int f = Integer.parseInt(jTextField2.getText());
-        pTreeThread1 = new MainThread(currentnetwork, currentnetworkview,minRadioButton.isSelected(), this,q,f);
+        pTreeThread1 = new MainThread(currentnetwork, currentnetworkview,viewCheckBox.isSelected(), this,q,f);
         pTreeThread1.start();                  // TODO add your handling code here:        // TODO add your handling code here:
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
+        // TODO add your handling code here:
+        currentnetworkview = cyApplicationManager.getCurrentNetworkView();
+        currentnetwork = currentnetworkview.getModel();
+        clearAll = new ClearView(currentnetwork,currentnetworkview,this);
+        clearAll.start();
+    }//GEN-LAST:event_jButton2ActionPerformed
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton HAMCycleButton;
@@ -470,6 +492,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     private javax.swing.JButton exitButton;
     private javax.swing.JButton helpButton;
     private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButton2;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel4;
@@ -486,11 +509,11 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     private javax.swing.JTextField jTextField2;
     private javax.swing.JButton kruskalsTreeButton;
     private javax.swing.JRadioButton maxRadioButton;
-    private javax.swing.JRadioButton minRadioButton;
     private javax.swing.JButton primsTreeButton;
     private javax.swing.JProgressBar statusBar;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JButton stopButton;
+    private javax.swing.JCheckBox viewCheckBox;
     // End of variables declaration//GEN-END:variables
 
     @Override

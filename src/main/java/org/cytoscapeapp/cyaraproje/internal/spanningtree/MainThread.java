@@ -38,7 +38,7 @@ import org.cytoscapeapp.cyaraproje.internal.ProjectStartMenu;
 import org.cytoscapeapp.cyaraproje.internal.CyActivator;
 import org.cytoscapeapp.cyaraproje.internal.cycle.ConnectedComponents;
 import org.cytoscapeapp.cyaraproje.internal.visuals.SpanningTreeUpdateView;
-
+import org.cytoscape.view.model.View;
 public class MainThread extends Thread {
 
     public boolean stop;
@@ -54,6 +54,7 @@ public class MainThread extends Thread {
     public CyNetworkFactory netFactory;
     public CyNetworkManager netManager;
     boolean isStepped;
+    public CyNetworkView defaultnetworkview;
     public MainThread(CyNetwork currentnetwork, CyNetworkView currentnetworkview,boolean isStepped, ProjectStartMenu menu, double q, int f) {
         this.currentnetwork = currentnetwork;
         this.currentnetworkview = currentnetworkview;
@@ -68,6 +69,7 @@ public class MainThread extends Thread {
 
     @Override
     public void run() {
+        defaultnetworkview = currentnetworkview;
         List<CyNode> nodes = CyTableUtil.getNodesInState(currentnetwork, "selected", true);
         JOptionPane.showMessageDialog(null, "Number of selected nodes are " + nodes.size());
         JOptionPane.showMessageDialog(null, "q value " + q);
@@ -122,6 +124,7 @@ public class MainThread extends Thread {
             }
         }*/
             currentnetworkview.updateView();
+       
         }
      
 
