@@ -47,7 +47,7 @@ import org.cytoscapeapp.cyaraproje.internal.cycle.ConnectedComponents;
 import org.cytoscapeapp.cyaraproje.internal.visuals.SpanningTreeUpdateView;
 import org.cytoscape.view.model.View;
 
-public class MainThread implements Runnable {
+public class MainThreadOne implements Runnable {
 
     public boolean stop;
     public CyNetwork currentnetwork;
@@ -59,14 +59,14 @@ public class MainThread implements Runnable {
     public CyNetwork STNetwork = null;
     private double q;
     private int f;
-
+    private double qtmp;
     public int stepcounter;
     public CyNetworkFactory netFactory;
     public CyNetworkManager netManager;
     boolean isStepped;
     public CyNetworkView defaultnetworkview;
 
-    public MainThread(CyNetwork currentnetwork, CyNetworkView currentnetworkview, boolean isStepped, ProjectStartMenu menu, double q, int f) {
+    public MainThreadOne(CyNetwork currentnetwork, CyNetworkView currentnetworkview, boolean isStepped, ProjectStartMenu menu, double q, int f) {
         this.currentnetwork = currentnetwork;
         this.currentnetworkview = currentnetworkview;
         this.netFactory = netFactory;
@@ -83,6 +83,8 @@ public class MainThread implements Runnable {
         defaultnetworkview = currentnetworkview;
         String columnName1 = "Infection";
         String columnName2 = "When";
+        int infectedVal = 1;
+        qtmp = 1;
         if (stepcounter == 0) {
             List<CyNode> nodes = CyTableUtil.getNodesInState(currentnetwork, "selected", true);
             //JOptionPane.showMessageDialog(null, "Number of selected nodes are " + nodes.size());
@@ -104,35 +106,20 @@ public class MainThread implements Runnable {
         }
         int step = stepcounter;
         if (isStepped) {
-            Set<CyNode> nodeWithValue = getNodesWithValue(currentnetwork, currentnetwork.getDefaultNodeTable(), "When", step);
-            if(nodeWithValue.isEmpty()){
-                JOptionPane.showMessageDialog(null, "There is no neighbors left to be infected");                
-                }else{
-            for (CyNode nodeIterator : nodeWithValue) {
-                List<CyNode> neighbors = currentnetwork.getNeighborList(nodeIterator, CyEdge.Type.ANY);
-                
-                for (CyNode neighbor : neighbors) {
-
-                    if (Math.random() <= q) {
-                        if (currentnetwork.getRow(neighbor).isSet(columnName1) == false) {
-                            currentnetworkview.getNodeView(neighbor).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.ORANGE);
-                            currentnetworkview.getNodeView(neighbor).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.OCTAGON);
-                            currentnetwork.getRow(neighbor).set(columnName2, step + 1);
-                            currentnetwork.getRow(neighbor).set(columnName1, 1);
-                        }
-                    }
-                }}
-            }
-
-        } else {
-            for (step = stepcounter; step < f; step++) {
-
-                Set<CyNode> nodeWithValue = getNodesWithValue(currentnetwork, currentnetwork.getDefaultNodeTable(), "When", step);
+            
+                Set<CyNode> nodeWithValue = getNodesWithValue(currentnetwork, currentnetwork.getDefaultNodeTable(), "Infection", infectedVal);
                 for (CyNode nodeIterator : nodeWithValue) {
                     List<CyNode> neighbors = currentnetwork.getNeighborList(nodeIterator, CyEdge.Type.ANY);
                     for (CyNode neighbor : neighbors) {
-
-                        if (Math.random() <= q) {
+                        List<CyNode> neighborsOfNeighbors = currentnetwork.getNeighborList(neighbor, CyEdge.Type.ANY);
+                        for(CyNode neighborOfNeighbor : neighborsOfNeighbors){
+                        if(currentnetwork.getRow(neighborOfNeighbor).isSet(columnName1)==true){
+                        qtmp=qtmp*(1-q);
+                        
+                        }                        
+                        }
+                        qtmp = 1 - qtmp;
+                        if (Math.random() <= qtmp) {
                             if (currentnetwork.getRow(neighbor).isSet(columnName1) == false) {
                                 currentnetworkview.getNodeView(neighbor).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.ORANGE);
                                 currentnetworkview.getNodeView(neighbor).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.OCTAGON);
@@ -140,22 +127,38 @@ public class MainThread implements Runnable {
                                 currentnetwork.getRow(neighbor).set(columnName1, 1);
                             }
                         }
+                        qtmp = 1;
+                    }
+                }
+
+        } else {
+            for (step = stepcounter; step < f; step++) {
+
+                Set<CyNode> nodeWithValue = getNodesWithValue(currentnetwork, currentnetwork.getDefaultNodeTable(), "Infection", infectedVal);
+                for (CyNode nodeIterator : nodeWithValue) {
+                    List<CyNode> neighbors = currentnetwork.getNeighborList(nodeIterator, CyEdge.Type.ANY);
+                    for (CyNode neighbor : neighbors) {
+                        List<CyNode> neighborsOfNeighbors = currentnetwork.getNeighborList(neighbor, CyEdge.Type.ANY);
+                        for(CyNode neighborOfNeighbor : neighborsOfNeighbors){
+                        if(currentnetwork.getRow(neighborOfNeighbor).isSet(columnName1)==true){
+                        qtmp=qtmp*(1-q);
+                        
+                        }                        
+                        }
+                        qtmp = 1 - qtmp;
+                        if (Math.random() <= qtmp) {
+                            if (currentnetwork.getRow(neighbor).isSet(columnName1) == false) {
+                                currentnetworkview.getNodeView(neighbor).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.ORANGE);
+                                currentnetworkview.getNodeView(neighbor).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.OCTAGON);
+                                currentnetwork.getRow(neighbor).set(columnName2, step + 1);
+                                currentnetwork.getRow(neighbor).set(columnName1, 1);
+                            }
+                        }
+                        qtmp = 1;
                     }
                 }
             }
         }
-        /*Random rand = new Random();
-        int r = rand.nextInt(100);
-        List<CyNode> neighbors = currentnetwork.getNeighborList(rootNode, CyEdge.Type.ANY);
-
-        for (CyNode neighbor : neighbors) {
-
-            if (r <= q * 100) {
-                currentnetworkview.getNodeView(neighbor).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.ORANGE);
-                currentnetworkview.getNodeView(neighbor).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.OCTAGON);
-                r = rand.nextInt(100);
-            }
-        }*/
         currentnetworkview.updateView();
 
     }

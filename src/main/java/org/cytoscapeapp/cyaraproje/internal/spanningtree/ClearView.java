@@ -71,7 +71,8 @@ public class ClearView extends Thread {
         }
         nodeTable.deleteColumn(columnName2);
         nodeTable.deleteColumn(columnName1);
-            currentnetworkview.updateView();
+        currentnetworkview.updateView();
+        
        
         }
     public void end() {

@@ -1,9 +1,8 @@
 package org.cytoscapeapp.cyaraproje.internal;
 
-
 /**
  *
- * @author smd.faizan@gmail.com
+ *
  */
 import java.awt.Color;
 import java.awt.Component;
@@ -20,7 +19,8 @@ import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.model.*;
 import org.cytoscape.task.edit.MapTableToNetworkTablesTaskFactory;
-
+import java.awt.*;
+import java.awt.event.*;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscape.view.presentation.property.BasicVisualLexicon;
 import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
@@ -30,6 +30,9 @@ import org.cytoscapeapp.cyaraproje.internal.cycle.ConnectedComponents;
 import org.cytoscapeapp.cyaraproje.internal.spanningtree.ClearView;
 import org.cytoscapeapp.cyaraproje.internal.spanningtree.CreateTableTask;
 import org.cytoscapeapp.cyaraproje.internal.spanningtree.MainThread;
+import org.cytoscapeapp.cyaraproje.internal.spanningtree.MainThreadTwo;
+import org.cytoscapeapp.cyaraproje.internal.spanningtree.MainThreadOne;
+import org.cytoscapeapp.cyaraproje.internal.spanningtree.MainThreadThree;
 import org.cytoscapeapp.cyaraproje.internal.visuals.ChangeEdgeAttributeListener;
 
 public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelComponent {
@@ -44,11 +47,15 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     static String edgeWeightAttribute;
     public static CyColumn edgeWeightAttributeColumn;
     public static final String DEFAULT_WEIGHT_ATTRIBUTE = "DefaultWeightTakenAsOne";
- 
+    public int ctrl;
     public MainThread pTreeThread1;
+    public MainThreadTwo mThread2;
+    public MainThreadOne mThread1;
+    public MainThreadThree mThread3;
     public ClearView clearAll;
     public CreateTableTask createTable;
     public EdgeRemoval edgeRemovalThread;
+    public int stepcounter = 0;
 
     public ProjectStartMenu(CyActivator cyactivator, ProjectCore spanningtreecore) {
         initComponents();
@@ -56,10 +63,11 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         this.spanningtreecore = spanningtreecore;
         cyApplicationManager = cyactivator.getcyApplicationManager();
         cyDesktopService = cyactivator.getcytoscapeDesktopService();
-        if(cyApplicationManager.getCurrentNetworkView() != null )
+        if (cyApplicationManager.getCurrentNetworkView() != null) {
             edgeAttributesComboBox.setModel(new javax.swing.DefaultComboBoxModel(
                     ChangeEdgeAttributeListener.getEdgeAttributes(
                             cyApplicationManager.getCurrentNetworkView().getModel()).toArray()));
+        }
         edgeAttributesComboBox.setSelectedItem("None");
     }
 
@@ -83,7 +91,8 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         jLabel1 = new javax.swing.JLabel();
         jLabel4 = new javax.swing.JLabel();
         viewCheckBox = new javax.swing.JCheckBox();
-        jButton2 = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jComboBox1 = new javax.swing.JComboBox<>();
         jPanel4 = new javax.swing.JPanel();
         statusBar = new javax.swing.JProgressBar();
         statusLabel = new javax.swing.JLabel();
@@ -98,6 +107,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         jPanel7 = new javax.swing.JPanel();
         helpButton = new javax.swing.JButton();
         exitButton = new javax.swing.JButton();
+        jButton2 = new javax.swing.JButton();
         jLabel2 = new javax.swing.JLabel();
 
         setBorder(javax.swing.BorderFactory.createEtchedBorder());
@@ -131,13 +141,15 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         jLabel4.setToolTipText("");
 
         viewCheckBox.setText("View Infection step by step");
-
-        jButton2.setText("Clear");
-        jButton2.addActionListener(new java.awt.event.ActionListener() {
+        viewCheckBox.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton2ActionPerformed(evt);
+                viewCheckBoxActionPerformed(evt);
             }
         });
+
+        jLabel3.setText("0");
+
+        jComboBox1.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Algorithm 1", "Algorithm 2", "Algorithm 3" }));
 
         org.jdesktop.layout.GroupLayout jPanel3Layout = new org.jdesktop.layout.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -148,18 +160,20 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                     .add(jPanel3Layout.createSequentialGroup()
                         .add(viewCheckBox)
                         .add(18, 18, 18)
-                        .add(jButton1)
-                        .add(18, 18, 18)
-                        .add(jButton2))
-                    .add(jPanel3Layout.createSequentialGroup()
-                        .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
-                            .add(jLabel1)
-                            .add(jLabel4))
+                        .add(jLabel3)
+                        .add(0, 0, Short.MAX_VALUE))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel3Layout.createSequentialGroup()
+                        .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
+                            .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                            .add(jLabel4)
+                            .add(jComboBox1, 0, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                         .add(30, 30, 30)
                         .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jTextField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
-                .addContainerGap(66, Short.MAX_VALUE))
+                            .add(jTextField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 59, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 122, Short.MAX_VALUE)
+                        .add(jButton1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 65, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -167,16 +181,18 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                 .addContainerGap()
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jTextField1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel1))
+                    .add(jLabel1)
+                    .add(jButton1))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel4)
                     .add(jTextField2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 50, Short.MAX_VALUE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jComboBox1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, 18, Short.MAX_VALUE)
                 .add(jPanel3Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jButton1)
                     .add(viewCheckBox)
-                    .add(jButton2)))
+                    .add(jLabel3)))
         );
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder("Status bar"));
@@ -333,6 +349,13 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
+        jButton2.setText("Clear");
+        jButton2.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton2ActionPerformed(evt);
+            }
+        });
+
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -345,7 +368,10 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                     .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.TRAILING, false)
                         .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                        .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 281, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))))
+                        .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel2Layout.createSequentialGroup()
+                            .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 281, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                            .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                            .add(jButton2)))))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -355,8 +381,13 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel6, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 57, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
+                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .add(jPanel4, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 57, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED))
+                    .add(org.jdesktop.layout.GroupLayout.TRAILING, jPanel2Layout.createSequentialGroup()
+                        .add(jButton2)
+                        .add(21, 21, 21)))
                 .add(jSeparator1, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 10, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.UNRELATED)
                 .add(jPanel7, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -376,7 +407,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                 .add(jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                     .add(jLabel2)
                     .add(jPanel2, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                .addContainerGap(22, Short.MAX_VALUE))
+                .addContainerGap(23, Short.MAX_VALUE))
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -414,7 +445,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     }//GEN-LAST:event_exitButtonActionPerformed
 
     private void helpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_helpButtonActionPerformed
-/*        // TODO add your handling code here:
+        /*        // TODO add your handling code here:
         SpanningTreeHelp help = new SpanningTreeHelp();
         help.setText(1);
         help.setVisible(true);*/
@@ -430,7 +461,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
 
     private void primsTreeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_primsTreeButtonActionPerformed
         // TODO add your handling code here:
-       /* currentnetworkview = cyApplicationManager.getCurrentNetworkView();
+        /* currentnetworkview = cyApplicationManager.getCurrentNetworkView();
         currentnetwork = currentnetworkview.getModel();
         edgeWeightAttribute = inputEdgeAttributeAndValidate(currentnetwork.getDefaultEdgeTable());
         CyNode rootNode = askRootNode();
@@ -460,8 +491,8 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_stopButtonActionPerformed
         // TODO add your handling code here:
-       
-        if(pTreeThread1.isAlive()){
+
+        if (pTreeThread1.stop) {
             pTreeThread1.end();
             stopcalculus(null);
         }
@@ -473,18 +504,65 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         edgeWeightAttribute = inputEdgeAttributeAndValidate(currentnetwork.getDefaultEdgeTable());
         double q = Double.parseDouble(jTextField1.getText());
         int f = Integer.parseInt(jTextField2.getText());
-        pTreeThread1 = new MainThread(currentnetwork, currentnetworkview,viewCheckBox.isSelected(), this,q,f);
-        pTreeThread1.start();                  // TODO add your handling code here:        // TODO add your handling code here:
+        String x = jComboBox1.getSelectedItem().toString();
+        if (x == "Algorithm 1") {
+            mThread1 = new MainThreadOne(currentnetwork, currentnetworkview, viewCheckBox.isSelected(), this, q, f);
+            if (viewCheckBox.isSelected()) {
+                mThread1.setStep(stepcounter++);
+                jLabel3.setText(Integer.toString(stepcounter));
+            } else {
+                mThread1.setStep(0);
+            }
+            mThread1.run();
+        } else if (x == "Algorithm 2") {
+            mThread2 = new MainThreadTwo(currentnetwork, currentnetworkview, viewCheckBox.isSelected(), this, q, f);
+            if (viewCheckBox.isSelected()) {
+                mThread2.setStep(stepcounter++);
+                jLabel3.setText(Integer.toString(stepcounter));
+            } else {
+                mThread2.setStep(0);
+            }
+            mThread2.run();
+        } else if (x == "Algorithm 3") {
+            mThread3 = new MainThreadThree(currentnetwork, currentnetworkview, viewCheckBox.isSelected(), this, q, f);
+            if (viewCheckBox.isSelected()) {
+                mThread3.setStep(stepcounter++);
+                jLabel3.setText(Integer.toString(stepcounter));
+            } else {
+                mThread3.setStep(0);
+            }
+            mThread3.run();
+        } else {
+
+        }
+
+
     }//GEN-LAST:event_jButton1ActionPerformed
 
     private void jButton2ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton2ActionPerformed
         // TODO add your handling code here:
         currentnetworkview = cyApplicationManager.getCurrentNetworkView();
         currentnetwork = currentnetworkview.getModel();
-        clearAll = new ClearView(currentnetwork,currentnetworkview,this);
+        clearAll = new ClearView(currentnetwork, currentnetworkview, this);
         clearAll.start();
+        stepcounter = 0;
+        jLabel3.setText(Integer.toString(stepcounter));
     }//GEN-LAST:event_jButton2ActionPerformed
-    
+
+    private void viewCheckBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_viewCheckBoxActionPerformed
+        // TODO add your handling code here:
+        if (viewCheckBox.isSelected() == true) // if check box is checked
+        {
+            jLabel4.setEnabled(false);
+            jTextField2.setEnabled(false);
+            jButton1.setText("Next");// button text will change into parameter msg..
+        } else {    // if check box unchecked 
+            jLabel4.setEnabled(true);
+            jTextField2.setEnabled(true);
+            jButton1.setText("Start");//change the text on the button
+        }
+    }//GEN-LAST:event_viewCheckBoxActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton HAMCycleButton;
     private javax.swing.ButtonGroup buttonGroup2;
@@ -493,8 +571,10 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     private javax.swing.JButton helpButton;
     private javax.swing.JButton jButton1;
     private javax.swing.JButton jButton2;
+    private javax.swing.JComboBox<String> jComboBox1;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
     private javax.swing.JLabel jLabel5;
     private javax.swing.JPanel jPanel2;
@@ -535,14 +615,14 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     public Icon getIcon() {
         return null;
     }
-    
-    public void setStatusLabel(String status){
+
+    public void setStatusLabel(String status) {
         this.statusLabel.setText(status);
     }
-    
-public String inputEdgeAttributeAndValidate(CyTable edgeTable){
+
+    public String inputEdgeAttributeAndValidate(CyTable edgeTable) {
         edgeWeightAttribute = edgeAttributesComboBox.getSelectedItem().toString();
-        if(edgeWeightAttribute.equals("None")){
+        if (edgeWeightAttribute.equals("None")) {
             // assume all edges with equal weights.
 //            edgeWeightAttribute = DEFAULT_WEIGHT_ATTRIBUTE;
 //            if(edgeTable.getColumn(edgeWeightAttribute) == null)
@@ -552,70 +632,72 @@ public String inputEdgeAttributeAndValidate(CyTable edgeTable){
             edgeWeightAttribute = null;
             return null;
         } else {
-            if(edgeTable.getColumn(edgeWeightAttribute) != null){
+            if (edgeTable.getColumn(edgeWeightAttribute) != null) {
                 edgeWeightAttributeColumn = edgeTable.getColumn(edgeWeightAttribute);
-                System.out.println("using "+edgeWeightAttribute+" as edge attribute.");
+                System.out.println("using " + edgeWeightAttribute + " as edge attribute.");
                 return edgeWeightAttribute;
-            } else{
+            } else {
                 // this case in not possible
-                JOptionPane.showMessageDialog(null, " no column with name "+edgeWeightAttribute+" exists. Exiting!", "Spanning Tree", JOptionPane.ERROR_MESSAGE);
-                return null;         
+                JOptionPane.showMessageDialog(null, " no column with name " + edgeWeightAttribute + " exists. Exiting!", "Spanning Tree", JOptionPane.ERROR_MESSAGE);
+                return null;
             }
         }
     }
-    
-    public CyNode askRootNode(){
-        CyNode rootNode=null;
-        String rootNodeName =  JOptionPane.showInputDialog(null, "Enter the name of rootNode for Prim's algo (case sensitive).");
-        if(rootNodeName!=null){
-            for(CyNode node:currentnetwork.getNodeList()){
-                if(currentnetwork.getRow(node).get(CyNetwork.NAME, String.class).equals(rootNodeName)){
+
+    public CyNode askRootNode() {
+        CyNode rootNode = null;
+        String rootNodeName = JOptionPane.showInputDialog(null, "Enter the name of rootNode for Prim's algo (case sensitive).");
+        if (rootNodeName != null) {
+            for (CyNode node : currentnetwork.getNodeList()) {
+                if (currentnetwork.getRow(node).get(CyNetwork.NAME, String.class).equals(rootNodeName)) {
                     rootNode = node;
                 }
             }
-            if(rootNode == null){
-                JOptionPane.showMessageDialog(null, " no node with name "+rootNodeName+" exists. Aborting!", "Spanning Tree", JOptionPane.ERROR_MESSAGE);
+            if (rootNode == null) {
+                JOptionPane.showMessageDialog(null, " no node with name " + rootNodeName + " exists. Aborting!", "Spanning Tree", JOptionPane.ERROR_MESSAGE);
                 return null;
             }
-  
-        } else{
+
+        } else {
             JOptionPane.showMessageDialog(null, "Please enter node name!", "Spanning Tree", JOptionPane.ERROR_MESSAGE);
             return null;
         }
         return rootNode;
     }
 
-    
     public void endOfComputation(String message) {
-    	statusBar.setIndeterminate(false);
-        if(message == null)
+        statusBar.setIndeterminate(false);
+        if (message == null) {
             statusLabel.setText("Calculation Done.");
-        else
+        } else {
             statusLabel.setText(message);
+        }
         kruskalsTreeButton.setEnabled(true);
     }
 
     public void stopcalculus(String message) {
         statusBar.setIndeterminate(false);
-        if(message == null)
+        if (message == null) {
             statusLabel.setText("Interrupted by the user, click start to repeat");
-        else
+        } else {
             statusLabel.setText(message);
+        }
         kruskalsTreeButton.setEnabled(true);
     }
 
     public void calculatingresult(String message) {
         statusBar.setIndeterminate(true);
         statusBar.setVisible(true);
-        if(message == null)
+        if (message == null) {
             statusLabel.setText("Working ...");
-        else
+        } else {
             statusLabel.setText(message);
+        }
         kruskalsTreeButton.setEnabled(false);
     }
-    
-    public javax.swing.JComboBox getEdgeAttributeComboBox(){
+
+    public javax.swing.JComboBox getEdgeAttributeComboBox() {
         return edgeAttributesComboBox;
     }
-    
+
 }
