@@ -4,7 +4,7 @@ import java.util.Properties;
 
 import org.cytoscape.model.CyTableFactory;
 
-import org.cytoscapeapp.cyaraproje.internal.spanningtree.CreateTableTaskFactory;
+import org.cytoscapeapp.cyaraproje.internal.algorithms.CreateTableTaskFactory;
 
 import org.cytoscape.work.TaskFactory;
 

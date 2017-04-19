@@ -1,4 +1,4 @@
-package org.cytoscapeapp.cyaraproje.internal.spanningtree;
+package org.cytoscapeapp.cyaraproje.internal.algorithms;
 
 import org.cytoscape.model.CyTableFactory;
 import org.cytoscape.task.edit.MapTableToNetworkTablesTaskFactory;

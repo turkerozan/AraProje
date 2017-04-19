@@ -1,4 +1,4 @@
-package org.cytoscapeapp.cyaraproje.internal.spanningtree;
+package org.cytoscapeapp.cyaraproje.internal.algorithms;
 
 import java.io.IOException;
 import org.cytoscape.model.CyRow;
@@ -47,7 +47,7 @@ import org.cytoscapeapp.cyaraproje.internal.cycle.ConnectedComponents;
 import org.cytoscapeapp.cyaraproje.internal.visuals.SpanningTreeUpdateView;
 import org.cytoscape.view.model.View;
 
-public class MainThreadOne implements Runnable {
+public class MainThreadThree implements Runnable {
 
     public boolean stop;
     public CyNetwork currentnetwork;
@@ -66,7 +66,7 @@ public class MainThreadOne implements Runnable {
     boolean isStepped;
     public CyNetworkView defaultnetworkview;
 
-    public MainThreadOne(CyNetwork currentnetwork, CyNetworkView currentnetworkview, boolean isStepped, ProjectStartMenu menu, double q, int f) {
+    public MainThreadThree(CyNetwork currentnetwork, CyNetworkView currentnetworkview, boolean isStepped, ProjectStartMenu menu, double q, int f) {
         this.currentnetwork = currentnetwork;
         this.currentnetworkview = currentnetworkview;
         this.netFactory = netFactory;
@@ -107,7 +107,7 @@ public class MainThreadOne implements Runnable {
         int step = stepcounter;
         if (isStepped) {
             
-                Set<CyNode> nodeWithValue = getNodesWithValue(currentnetwork, currentnetwork.getDefaultNodeTable(), "Infection", infectedVal);
+                Set<CyNode> nodeWithValue = getNodesWithValue(currentnetwork, currentnetwork.getDefaultNodeTable(), "When", step);
                 for (CyNode nodeIterator : nodeWithValue) {
                     List<CyNode> neighbors = currentnetwork.getNeighborList(nodeIterator, CyEdge.Type.ANY);
                     for (CyNode neighbor : neighbors) {
@@ -134,7 +134,7 @@ public class MainThreadOne implements Runnable {
         } else {
             for (step = stepcounter; step < f; step++) {
 
-                Set<CyNode> nodeWithValue = getNodesWithValue(currentnetwork, currentnetwork.getDefaultNodeTable(), "Infection", infectedVal);
+                Set<CyNode> nodeWithValue = getNodesWithValue(currentnetwork, currentnetwork.getDefaultNodeTable(), "When", step);
                 for (CyNode nodeIterator : nodeWithValue) {
                     List<CyNode> neighbors = currentnetwork.getNeighborList(nodeIterator, CyEdge.Type.ANY);
                     for (CyNode neighbor : neighbors) {

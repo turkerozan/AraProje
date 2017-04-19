@@ -27,12 +27,13 @@ import org.cytoscape.view.presentation.property.NodeShapeVisualProperty;
 import org.cytoscape.work.TaskMonitor;
 import org.cytoscapeapp.cyaraproje.internal.clustering.EdgeRemoval;
 import org.cytoscapeapp.cyaraproje.internal.cycle.ConnectedComponents;
-import org.cytoscapeapp.cyaraproje.internal.spanningtree.ClearView;
-import org.cytoscapeapp.cyaraproje.internal.spanningtree.CreateTableTask;
-import org.cytoscapeapp.cyaraproje.internal.spanningtree.MainThread;
-import org.cytoscapeapp.cyaraproje.internal.spanningtree.MainThreadTwo;
-import org.cytoscapeapp.cyaraproje.internal.spanningtree.MainThreadOne;
-import org.cytoscapeapp.cyaraproje.internal.spanningtree.MainThreadThree;
+import org.cytoscapeapp.cyaraproje.internal.algorithms.ClearView;
+import org.cytoscapeapp.cyaraproje.internal.algorithms.CreateTableTask;
+import org.cytoscapeapp.cyaraproje.internal.algorithms.MainThread;
+import org.cytoscapeapp.cyaraproje.internal.algorithms.MainThreadTwo;
+import org.cytoscapeapp.cyaraproje.internal.algorithms.MainThreadOne;
+import org.cytoscapeapp.cyaraproje.internal.algorithms.MainThreadThree;
+import org.cytoscapeapp.cyaraproje.internal.algorithms.SourceDetection;
 import org.cytoscapeapp.cyaraproje.internal.visuals.ChangeEdgeAttributeListener;
 
 public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelComponent {
@@ -56,7 +57,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     public CreateTableTask createTable;
     public EdgeRemoval edgeRemovalThread;
     public int stepcounter = 0;
-
+    public SourceDetection sDetect1;
     public ProjectStartMenu(CyActivator cyactivator, ProjectCore spanningtreecore) {
         initComponents();
         this.cyactivator = cyactivator;
@@ -102,7 +103,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         jLabel5 = new javax.swing.JLabel();
         HAMCycleButton = new javax.swing.JButton();
         jPanel6 = new javax.swing.JPanel();
-        primsTreeButton = new javax.swing.JButton();
+        algo1Button = new javax.swing.JButton();
         kruskalsTreeButton = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         helpButton = new javax.swing.JButton();
@@ -275,11 +276,11 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
 
         jPanel6.setBorder(javax.swing.BorderFactory.createTitledBorder("Run algorithm"));
 
-        primsTreeButton.setForeground(new java.awt.Color(102, 0, 0));
-        primsTreeButton.setText("Algorithm 1");
-        primsTreeButton.addActionListener(new java.awt.event.ActionListener() {
+        algo1Button.setForeground(new java.awt.Color(102, 0, 0));
+        algo1Button.setText("Algorithm 1");
+        algo1Button.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                primsTreeButtonActionPerformed(evt);
+                algo1ButtonActionPerformed(evt);
             }
         });
 
@@ -297,7 +298,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
             jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(primsTreeButton)
+                .add(algo1Button)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(kruskalsTreeButton)
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
@@ -308,7 +309,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                 .addContainerGap()
                 .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(kruskalsTreeButton)
-                    .add(primsTreeButton))
+                    .add(algo1Button))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
@@ -459,17 +460,13 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
         spannigTreeThread.start();*/
     }//GEN-LAST:event_kruskalsTreeButtonActionPerformed
 
-    private void primsTreeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_primsTreeButtonActionPerformed
-        // TODO add your handling code here:
-        /* currentnetworkview = cyApplicationManager.getCurrentNetworkView();
-        currentnetwork = currentnetworkview.getModel();
-        edgeWeightAttribute = inputEdgeAttributeAndValidate(currentnetwork.getDefaultEdgeTable());
-        CyNode rootNode = askRootNode();
-        if(rootNode == null)
-        return;
-        pTreeThread = new PrimsTreeThread(currentnetwork, currentnetworkview, minRadioButton.isSelected(), edgeWeightAttribute, rootNode, this);
-        pTreeThread.start();*/
-    }//GEN-LAST:event_primsTreeButtonActionPerformed
+    private void algo1ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_algo1ButtonActionPerformed
+       currentnetworkview = cyApplicationManager.getCurrentNetworkView();
+       currentnetwork = currentnetworkview.getModel();
+       edgeWeightAttribute = inputEdgeAttributeAndValidate(currentnetwork.getDefaultEdgeTable());
+       sDetect1 = new SourceDetection(currentnetwork, currentnetworkview, this);
+       sDetect1.run();
+    }//GEN-LAST:event_algo1ButtonActionPerformed
 
     private void HAMCycleButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_HAMCycleButtonActionPerformed
 
@@ -565,6 +562,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton HAMCycleButton;
+    private javax.swing.JButton algo1Button;
     private javax.swing.ButtonGroup buttonGroup2;
     private javax.swing.JComboBox edgeAttributesComboBox;
     private javax.swing.JButton exitButton;
@@ -589,7 +587,6 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     private javax.swing.JTextField jTextField2;
     private javax.swing.JButton kruskalsTreeButton;
     private javax.swing.JRadioButton maxRadioButton;
-    private javax.swing.JButton primsTreeButton;
     private javax.swing.JProgressBar statusBar;
     private javax.swing.JLabel statusLabel;
     private javax.swing.JButton stopButton;
