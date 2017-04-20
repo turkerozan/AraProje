@@ -113,17 +113,17 @@ public class SourceDetection implements Runnable {
 
                     } else {
                         signals.get(nodeIterator.getSUID()).add(received.get(nodeIterator.getSUID()).get(i)); 
-                        JOptionPane.showMessageDialog(null, "node : " + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class)+ "signal list" 
-                        + currentnetwork.getRow(received.get(nodeIterator.getSUID()).get(i)).get(CyNetwork.NAME, String.class));
+                        //JOptionPane.showMessageDialog(null, "node : " + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class)+ "signal list" 
+                        //+ currentnetwork.getRow(received.get(nodeIterator.getSUID()).get(i)).get(CyNetwork.NAME, String.class));
                         List<CyNode> neighbors = currentnetwork.getNeighborList(nodeIterator, CyEdge.Type.ANY);
                         for (CyNode neighbor : neighbors) {
                             if (received.get(neighbor.getSUID()) != null) {
                                 if(received.get(neighbor.getSUID()).contains(received.get(nodeIterator.getSUID()).get(i))){
                                 //JOptionPane.showMessageDialog(null, "node : " + currentnetwork.getRow(neighbor).get(CyNetwork.NAME, String.class)
-                                 //+ " contains  " + currentnetwork.getRow(received.get(nodeIterator.getSUID()).get(i)).get(CyNetwork.NAME, String.class) );
+                                // + " contains  " + currentnetwork.getRow(received.get(nodeIterator.getSUID()).get(i)).get(CyNetwork.NAME, String.class) );
                                 }
                                 else {received.get(neighbor.getSUID()).add(received.get(nodeIterator.getSUID()).get(i));
-                                //JOptionPane.showMessageDialog(null, "node : " + currentnetwork.getRow(neighbor).get(CyNetwork.NAME, String.class)
+                               // JOptionPane.showMessageDialog(null, "node : " + currentnetwork.getRow(neighbor).get(CyNetwork.NAME, String.class)
                                  //+ " has " + currentnetwork.getRow(received.get(nodeIterator.getSUID()).get(i)).get(CyNetwork.NAME, String.class) );
                                 }
                             }
@@ -136,12 +136,13 @@ public class SourceDetection implements Runnable {
                     if (received.get(nodeIterator1.getSUID()).size() == sizem) {
                         JOptionPane.showMessageDialog(null, "root is " + currentnetwork.getRow(nodeIterator1).get(CyNetwork.NAME, String.class));
                         q = 1;
-                        //for (CyNode temp : received.get(nodeIterator1.getSUID())) {
+                        for (CyNode temp : received.get(nodeIterator1.getSUID())) {
 			//JOptionPane.showMessageDialog(null, "root list  " + currentnetwork.getRow(temp).get(CyNetwork.NAME, String.class));
-		//}
+		}
                     }
                 }
                 if (q == 1) {
+                    f = 1;
                     break;
                 }
             }
