@@ -134,7 +134,9 @@ public class SourceDetection implements Runnable {
                 }
                 for (CyNode nodeIterator1 : nodeWithValue) {
                     if (received.get(nodeIterator1.getSUID()).size() == sizem) {
-                        JOptionPane.showMessageDialog(null, "root is " + currentnetwork.getRow(nodeIterator1).get(CyNetwork.NAME, String.class));
+                        //JOptionPane.showMessageDialog(null, "root is " + currentnetwork.getRow(nodeIterator1).get(CyNetwork.NAME, String.class));
+                        currentnetworkview.getNodeView(nodeIterator1).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.pink);
+                        
                         q = 1;
                         for (CyNode temp : received.get(nodeIterator1.getSUID())) {
 			//JOptionPane.showMessageDialog(null, "root list  " + currentnetwork.getRow(temp).get(CyNetwork.NAME, String.class));
