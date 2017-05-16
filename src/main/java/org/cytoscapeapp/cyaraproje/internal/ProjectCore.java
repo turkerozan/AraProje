@@ -1,6 +1,7 @@
 package org.cytoscapeapp.cyaraproje.internal;
 
 import java.util.Properties;
+import java.util.Random;
 import org.cytoscape.application.CyApplicationManager;
 import org.cytoscape.application.events.SetCurrentNetworkListener;
 import org.cytoscape.application.swing.CySwingApplication;
@@ -8,6 +9,8 @@ import org.cytoscape.application.swing.CytoPanel;
 import org.cytoscape.application.swing.CytoPanelComponent;
 import org.cytoscape.application.swing.CytoPanelName;
 import org.cytoscape.model.CyNetwork;
+import org.cytoscape.model.CyNetworkFactory;
+import org.cytoscape.model.CyNetworkManager;
 import org.cytoscape.service.util.CyServiceRegistrar;
 import org.cytoscape.view.model.CyNetworkView;
 import org.cytoscapeapp.cyaraproje.internal.visuals.ChangeEdgeAttributeListener;
@@ -24,6 +27,10 @@ public class ProjectCore {
     public CySwingApplication cyDesktopService;
     public CyServiceRegistrar cyServiceRegistrar;
     public CyActivator cyactivator;
+    public CyNetworkFactory cyNetworkFactory;
+    public CyNetworkManager cyNetworkManager;
+    // random to be used throughout the app, so to avoid seed repetition
+    public Random random;
     public static ProjectStartMenu spanningtreestartmenu;
 
     public ProjectCore(CyActivator cyactivator) {
@@ -31,7 +38,12 @@ public class ProjectCore {
         this.cyApplicationManager = cyactivator.cyApplicationManager;
         this.cyDesktopService = cyactivator.cyDesktopService;
         this.cyServiceRegistrar = cyactivator.cyServiceRegistrar;
+        network = cyApplicationManager.getCurrentNetwork();
+        view = cyApplicationManager.getCurrentNetworkView();
+        cyNetworkFactory = cyactivator.getCyNetworkFactory();
+        cyNetworkManager = cyactivator.getCyNetworkManager();
         spanningtreestartmenu = createSpanningTreeStartMenu();
+        random = new Random();
         registerServices();
         updatecurrentnetwork();
     }
@@ -79,7 +91,17 @@ public class ProjectCore {
     public static ProjectStartMenu getSpanningTreeStartMenu(){
         return spanningtreestartmenu;
     }
+    public CyNetwork getCurrentnetwork() {
+        return network;
+    }
+    public void updateCurrentNetworks(){
+        network = cyApplicationManager.getCurrentNetwork();
+        view = cyApplicationManager.getCurrentNetworkView();
+    }
     
+    public CyNetworkView getCurrentnetworkView() {
+        return view;
+    }
     void registerServices(){
         ChangeEdgeAttributeListener changeEdgeAttributeListener = new ChangeEdgeAttributeListener();
         cyactivator.cyServiceRegistrar.registerService(changeEdgeAttributeListener, SetCurrentNetworkListener.class, new Properties());

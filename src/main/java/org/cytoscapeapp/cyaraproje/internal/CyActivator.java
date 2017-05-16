@@ -86,7 +86,12 @@ public class CyActivator extends AbstractCyActivator {
     public CyApplicationManager getcyApplicationManager() {
         return cyApplicationManager;
     }
-
+    public CyNetworkManager getcyNetworkManager() {
+        return networkManager;
+    }
+    public CyNetworkFactory getcyNetworkFactory() {
+        return networkFactory;
+    }
     public CySwingApplication getcytoscapeDesktopService() {
         return cyDesktopService;
     }
@@ -97,5 +102,13 @@ public class CyActivator extends AbstractCyActivator {
     
     public static CyAppAdapter getCyAppAdapter(){
         return appAdapter;
+    }
+
+    CyNetworkManager getCyNetworkManager() {
+        return networkManager;
+    }
+
+    CyNetworkFactory getCyNetworkFactory() {
+        return networkFactory;
     }
 }
