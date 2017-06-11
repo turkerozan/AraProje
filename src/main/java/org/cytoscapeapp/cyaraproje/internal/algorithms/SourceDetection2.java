@@ -1,5 +1,4 @@
 package org.cytoscapeapp.cyaraproje.internal.algorithms;
-
 import java.io.IOException;
 import org.cytoscape.model.CyRow;
 import org.cytoscape.model.CyTable;
