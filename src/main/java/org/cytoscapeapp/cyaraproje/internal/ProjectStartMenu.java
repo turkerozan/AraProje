@@ -35,6 +35,7 @@ import org.cytoscapeapp.cyaraproje.internal.algorithms.MainThreadTwo;
 import org.cytoscapeapp.cyaraproje.internal.algorithms.MainThreadOne;
 import org.cytoscapeapp.cyaraproje.internal.algorithms.MainThreadThree;
 import org.cytoscapeapp.cyaraproje.internal.algorithms.SourceDetection;
+import org.cytoscapeapp.cyaraproje.internal.algorithms.SourceDetection2;
 import org.cytoscapeapp.cyaraproje.internal.algorithms.WattsStrogatz;
 import org.cytoscapeapp.cyaraproje.internal.visuals.ChangeEdgeAttributeListener;
 
@@ -64,6 +65,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     public EdgeRemoval edgeRemovalThread;
     public int stepcounter = 0;
     public SourceDetection sDetect1;
+    public SourceDetection2 sDetect2;
     public ProjectStartMenu(CyActivator cyactivator, ProjectCore spanningtreecore) {
         initComponents();
         this.cyactivator = cyactivator;
@@ -77,7 +79,7 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
                     ChangeEdgeAttributeListener.getEdgeAttributes(
                             cyApplicationManager.getCurrentNetworkView().getModel()).toArray()));
         }
-        if (cyNetworkManager != null){
+        if (cyNetworkManager == null){
         //currentnetworkview = cyApplicationManager.getCurrentNetworkView();
         //currentnetwork = currentnetworkview.getModel();    
         //cyNetworkManager.addNetwork(currentnetwork);
@@ -506,11 +508,11 @@ public class ProjectStartMenu extends javax.swing.JPanel implements CytoPanelCom
     }//GEN-LAST:event_helpButtonActionPerformed
 
     private void kruskalsTreeButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_kruskalsTreeButtonActionPerformed
-        /*currentnetworkview = cyApplicationManager.getCurrentNetworkView();
-        currentnetwork = currentnetworkview.getModel();
-        edgeWeightAttribute = inputEdgeAttributeAndValidate(currentnetwork.getDefaultEdgeTable());
-        spannigTreeThread = new KruskalsTreeThread(currentnetwork, currentnetworkview, minRadioButton.isSelected(), edgeWeightAttribute, this);
-        spannigTreeThread.start();*/
+       currentnetworkview = cyApplicationManager.getCurrentNetworkView();
+       currentnetwork = currentnetworkview.getModel();
+       edgeWeightAttribute = inputEdgeAttributeAndValidate(currentnetwork.getDefaultEdgeTable());
+       sDetect2 = new SourceDetection2(currentnetwork, currentnetworkview, this);
+       sDetect2.run();
     }//GEN-LAST:event_kruskalsTreeButtonActionPerformed
 
     private void algo1ButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_algo1ButtonActionPerformed

@@ -87,7 +87,7 @@ public class SourceDetection implements Runnable {
         Map<Long, List<CyNode>> signals = new HashMap<Long, List<CyNode>>();
         Map<Long, List<CyNode>> pending = new HashMap<Long, List<CyNode>>();
         int sizem = nodeWithValue.size();
-
+        
         for (CyNode nodeIterator : nodeWithValue) {//initiliaze node maps for infected ones
             received.put(nodeIterator.getSUID(), new ArrayList<CyNode>());
             signals.put(nodeIterator.getSUID(), new ArrayList<CyNode>());
