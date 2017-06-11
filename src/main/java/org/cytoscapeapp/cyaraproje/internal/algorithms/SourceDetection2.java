@@ -101,17 +101,22 @@ public class SourceDetection2 implements Runnable {
         colors.add(Color.LIGHT_GRAY);
         int j = 0;
         int size = nodeList.size();
-        for(i=0;i<3;i++){
-            int x = ThreadLocalRandom.current().nextInt(0, size + 1);           
+     
+        while(centers.size()!=3){
+            int x = ThreadLocalRandom.current().nextInt(0, size + 1);
             rootNode = nodeList.get(x);
+            if(centers.contains(rootNode)){
+                
+            }
+            else{
             centers.add(nodeList.get(x));
             nodeList.remove(x);
             size--;
-            Color mc = (Color) colors.get(j++);
+            Color mc = (Color) colors.get(j);
             currentnetworkview.getNodeView(rootNode).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, mc);
-            currentnetworkview.getNodeView(centers.get(i)).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.ELLIPSE);
+            currentnetworkview.getNodeView(centers.get(j++)).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.ELLIPSE); 
+            }
         }
-        
         for (CyNode nodeIterator : centers) {//initiliaze node maps for infected ones
             centerss.put(nodeIterator.getSUID(), new ArrayList<CyNode>());
             centerss.get(nodeIterator.getSUID()).add(nodeIterator);
@@ -119,8 +124,7 @@ public class SourceDetection2 implements Runnable {
         }
         j=0;
         int il = 0;
-        while(nodeList.size()!=0){
-            
+        while(!nodeList.isEmpty()){            
             for (CyNode nodeIterator : centers) {
                 il = centerss.get(nodeIterator.getSUID()).size();
                 for(i=0;i<il;i++){
@@ -139,84 +143,84 @@ public class SourceDetection2 implements Runnable {
                 j++;
             }
             j = 0;
+            
         }
-        int k=0;
-        for(k=0;k<3;k++){
-            i = (int) INFINITY;
+        getNewRoot((centerss.get(centers.get(0).getSUID())),currentnetwork);
         
-        CyNode center = centers.get(k);
-        for(CyNode v : centerss.get(centers.get(0).getSUID())){
-            j=singleSourceDijkstra(currentnetwork, (ArrayList<CyNode>) centerss.get(center.getSUID()),v);
-            //JOptionPane.showMessageDialog(null,"Node : " + currentnetwork.getRow(v).get(CyNetwork.NAME, String.class) + " has dist " + j);
-            if(j<i){
-                i = j;
-                rootNode = v;
-            }
+    }
+    private static void getNewRoot( List<CyNode> subNetwork, CyNetwork currentnetwork){
+        int infectedVal = 1;
+        int f = 0;
+        
+        Set<CyNode> nodeWithValue = new HashSet<CyNode>(subNetwork);
+        JOptionPane.showMessageDialog(null, "Number of infected nodes are " + nodeWithValue.size());
+        Map<Long, List<CyNode>> received = new HashMap<Long, List<CyNode>>();
+        Map<Long, List<CyNode>> signals = new HashMap<Long, List<CyNode>>();
+        Map<Long, List<CyNode>> pending = new HashMap<Long, List<CyNode>>();
+        int sizem = nodeWithValue.size();
+        
+        for (CyNode nodeIterator : nodeWithValue) {//initiliaze node maps for infected ones
+            received.put(nodeIterator.getSUID(), new ArrayList<CyNode>());
+            signals.put(nodeIterator.getSUID(), new ArrayList<CyNode>());
+            pending.put(nodeIterator.getSUID(),new ArrayList<CyNode>());
         }
-        JOptionPane.showMessageDialog(null,"New Center : " + currentnetwork.getRow(rootNode).get(CyNetwork.NAME, String.class) );
-    }}
-    public static int  singleSourceDijkstra(
-        CyNetwork network,
-        ArrayList<CyNode> subNetwork,
-        CyNode source)
-    {
-        HashMap<CyNode, Double> distances = new HashMap<CyNode, Double>();
-        HashMap<CyNode, CyNode> previous = new HashMap<CyNode, CyNode>();
-        ArrayList<CyNode> pq = new ArrayList<CyNode>();
 
-        // intializes distances
-        for (CyNode v : subNetwork)
-        {
-            distances.put(v, INFINITY);
-            previous.put(v, null);
+        for (CyNode nodeIterator : nodeWithValue) {
+            signals.get(nodeIterator.getSUID()).add(nodeIterator);
         }
-        distances.put(source, 0.);
-        pq.add(source);
-
-        while (!pq.isEmpty())
-        {
-            CyNode current = pq.remove(0);
-
-            // goes through the neighbors
-            for (CyEdge neighborEdge : network.getAdjacentEdgeList(current, CyEdge.Type.OUTGOING))
-            {
-                CyNode neighbor = neighborEdge.getTarget();
-                if(subNetwork.contains(neighbor)){
-                double newCost =
-                    distances.get(current) + getWeight(network, neighborEdge);
-
-                if (newCost < distances.get(neighbor))
-                {
-                    distances.put(neighbor, newCost);
-                    previous.put(neighbor, current);
-
-                    // add to priority queue
-                    pq.remove(neighbor);
-                    for (int i = 0; i < pq.size(); i++)
-                    {
-                        if (distances.get(neighbor) < distances.get(pq.get(i)))
-                        {
-                            pq.add(i, neighbor);
-                            break;
+        int i = 0;
+        int q = 0;
+        int j = 0;
+        while (f == 0) {
+            //JOptionPane.showMessageDialog(null, "DB 1 : ");
+            for (CyNode nodeIterator : nodeWithValue) {
+                //JOptionPane.showMessageDialog(null, "DB 2 : ");
+                for(CyNode signalIterator : signals.get(nodeIterator.getSUID())){
+                   // JOptionPane.showMessageDialog(null, "DB 3 : ");
+                    for(CyNode neighborIterator : currentnetwork.getNeighborList(nodeIterator, CyEdge.Type.ANY)){
+                      // JOptionPane.showMessageDialog(null, "DB 4 : ");
+                        if(currentnetwork.getRow(neighborIterator).isSet("Infection")==true || nodeWithValue.contains(neighborIterator) ){
+                        pending.get(neighborIterator.getSUID()).add(signalIterator);
+                        JOptionPane.showMessageDialog(null, "node : " + currentnetwork.getRow(neighborIterator).get(CyNetwork.NAME, String.class)+ "pending list" 
+                        + currentnetwork.getRow(signalIterator).get(CyNetwork.NAME, String.class));
                         }
                     }
-                    if (!pq.contains(neighbor))
-                        pq.add(neighbor);
                 }
+                JOptionPane.showMessageDialog(null, "DB 1 : ");
+                signals.get(nodeIterator.getSUID()).clear();
             }
-        }}
-
-       int j = 0;
-         for (CyNode v : subNetwork){
-             j = distances.get(v).intValue() + j;
-         }
-         return j;
-    }
-     public static double getWeight(CyNetwork network, CyEdge edge)
-    {
-       
-            return -44444;
-   
+            for(CyNode nodeIterator: nodeWithValue){
+                JOptionPane.showMessageDialog(null, "Node" + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class));
+               
+                for(CyNode pendingIterator : pending.get(nodeIterator.getSUID())){
+                    
+                    if(received.get(nodeIterator.getSUID()).contains(pendingIterator)){
+                    JOptionPane.showMessageDialog(null,"we have this node in rec.");
+                    }
+                    else{
+                        JOptionPane.showMessageDialog(null, "Node:" + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class)
+                        +   " Has sig and rec " + currentnetwork.getRow(pendingIterator).get(CyNetwork.NAME, String.class));
+                        signals.get(nodeIterator.getSUID()).add(pendingIterator);
+                        received.get(nodeIterator.getSUID()).add(pendingIterator);
+                    }
+                    
+                }
+                
+                pending.get(nodeIterator.getSUID()).clear();
+                JOptionPane.showMessageDialog(null, "Node:" + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class)+"PEnding List deleted");
+                        
+            }
+            for(CyNode nodeIterator: nodeWithValue){
+                if(received.get(nodeIterator.getSUID()).size()==sizem){
+                    JOptionPane.showMessageDialog(null, "root  : " + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class));
+                    f=1;
+                    JOptionPane.showMessageDialog(null,"Algorithm Bitti");
+                }
+               
+                
+            }
+            
+        }
     }
     public void setStep(int stepcounter) {
         this.stepcounter = stepcounter;
