@@ -9,10 +9,10 @@
 
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>org.cytoscapeapp</groupId>
-	<artifactId>AraProje</artifactId>
-	<version>0.1</version>
+	<artifactId>InformationAnalyzer</artifactId>
+	<version>1.0</version>
 
-	<name>AraProje</name>
+	<name>InformationAnalyzer</name>
 	
 	<packaging>bundle</packaging>
 

@@ -98,11 +98,12 @@ public class MainThreadOne implements Runnable {
             }
 
             List<CyNode> nodeList = currentnetwork.getNodeList();
-            CyNode rootNode = nodes.get(0);
+            for(CyNode nodeIterator : nodes){CyNode rootNode = nodeIterator;
             currentnetwork.getRow(rootNode).set(columnName1, new Integer(1));
-            JOptionPane.showMessageDialog(null, "Root Infected");
+            
             currentnetworkview.getNodeView(rootNode).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.RED);
-            currentnetwork.getRow(rootNode).set(columnName2, new Integer(0));
+            currentnetwork.getRow(rootNode).set(columnName2, new Integer(0));}
+            JOptionPane.showMessageDialog(null, "Root(s) Infected");
         }
         int step = stepcounter;
         if (isStepped) {

@@ -18,6 +18,7 @@ import java.awt.*;
 import java.awt.event.*;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -82,47 +83,91 @@ public class SourceDetection2 implements Runnable {
     public void run() {
         int infectedVal = 1;
         f = 0;
+        int k = 3;
+        int l = 5;
         Set<CyNode> nodeWithValue = getNodesWithValue(currentnetwork, currentnetwork.getDefaultNodeTable(), "Infection", infectedVal);
         JOptionPane.showMessageDialog(null, "Number of infected nodes are " + nodeWithValue.size());
-        Map<Long, List<CyNode>> centerss = new HashMap<Long, List<CyNode>>();
-        //Map<Long, List<CyNode>> signals = new HashMap<Long, List<CyNode>>();
-        
-        
-        int i;
+        Map<Long, List<CyNode>> centerss = new HashMap<Long, List<CyNode>>();      
+       
         List<CyNode> nodeList = new ArrayList<CyNode>() ;
         List<CyNode> centers = new ArrayList<CyNode>() ;
-        
         for (CyNode nodeIterator : nodeWithValue) {
         nodeList.add(nodeIterator);
         }
+        
+        int size = nodeList.size();
         ArrayList colors = new ArrayList(); 
-        colors.add(Color.BLUE);
         colors.add(Color.MAGENTA);
         colors.add(Color.LIGHT_GRAY);
+        colors.add(Color.BLUE);
+        colors.add(Color.GREEN);
+        colors.add(Color.DARK_GRAY);
         int j = 0;
-        int size = nodeList.size();
-     
-        while(centers.size()!=3){
-            int x = ThreadLocalRandom.current().nextInt(0, size + 1);
-            rootNode = nodeList.get(x);
-            if(centers.contains(rootNode)){
-                
+        
+        ArrayList<Integer> list = new ArrayList<Integer>();
+        for (int i=0; i<nodeList.size()-1; i++) {
+            list.add(new Integer(i));
+        }
+        Collections.shuffle(list);
+        for (int i=0; i<k; i++) {
+            centers.add(nodeList.get(i));
+            nodeList.remove(i);
+            Color mc = (Color) colors.get(i);
+            currentnetworkview.getNodeView(centers.get(i)).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, mc);
+            currentnetworkview.getNodeView(centers.get(i)).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.ELLIPSE); 
+        }   
+
+        j=0;
+        for(l=0;l<10;l++){
+        //JOptionPane.showMessageDialog(null, "Cluster started");    
+        centerss = clusterNetwork(centers,nodeList,currentnetworkview,currentnetwork);
+        List<CyNode> centersTmp = new ArrayList<CyNode>() ;
+        for(int i=0;i<k;i++){
+            rootNode = getNewRoot((centerss.get(centers.get(i).getSUID())),currentnetwork);
+            if(rootNode == null){
+               JOptionPane.showMessageDialog(null, "NULL RETURNED "); 
             }
             else{
-            centers.add(nodeList.get(x));
-            nodeList.remove(x);
-            size--;
-            Color mc = (Color) colors.get(j);
-            currentnetworkview.getNodeView(rootNode).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, mc);
-            currentnetworkview.getNodeView(centers.get(j++)).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.ELLIPSE); 
+                centersTmp.add(rootNode);
             }
         }
+        //JOptionPane.showMessageDialog(null, "Roots changing");
+        for(int i = 0; i<k ; i++){   
+            Color mc = (Color) colors.get(i);
+            currentnetworkview.getNodeView(centersTmp.get(i)).setVisualProperty(BasicVisualLexicon.NODE_FILL_COLOR, Color.pink);
+            currentnetworkview.getNodeView(centers.get(i)).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.HEXAGON); 
+            currentnetworkview.getNodeView(centersTmp.get(i)).setVisualProperty(BasicVisualLexicon.NODE_SHAPE, NodeShapeVisualProperty.ELLIPSE);
+            
+ 
+        }
+        centers = centersTmp;
+        //second clusterdan once, nodelisti popule ediyoruz;
+        for (CyNode nodeIterator : nodeWithValue) {
+        nodeList.add(nodeIterator);
+        }
+        //nodelisten centerlar? ç?kar?yoruz
+        for(CyNode nodeIterator : centers){
+            nodeList.remove(nodeIterator);
+        }
+        /*JOptionPane.showMessageDialog(null, "Second cluster starts  with nodelist size and center size  " + nodeList.size()+""+centers.size());
+        centerss = clusterNetwork(centers,nodeList,currentnetworkview,currentnetwork);
+        JOptionPane.showMessageDialog(null, "Second cluster STOPPED   ");
+        */
+        }}
+    private static Map<Long, List<CyNode>> clusterNetwork(List<CyNode> centers,List<CyNode> nodeList,CyNetworkView currentnetworkview,CyNetwork currentnetwork ){
+        Map<Long, List<CyNode>> centerss = new HashMap<Long, List<CyNode>>(); 
+        ArrayList colors = new ArrayList(); 
+        colors.add(Color.MAGENTA);
+        colors.add(Color.LIGHT_GRAY);
+        colors.add(Color.BLUE);
+        colors.add(Color.GREEN);
+        colors.add(Color.DARK_GRAY);
+        int j = 0;
         for (CyNode nodeIterator : centers) {//initiliaze node maps for infected ones
             centerss.put(nodeIterator.getSUID(), new ArrayList<CyNode>());
-            centerss.get(nodeIterator.getSUID()).add(nodeIterator);
-            
+            centerss.get(nodeIterator.getSUID()).add(nodeIterator);            
         }
-        j=0;
+        int i;
         int il = 0;
         while(!nodeList.isEmpty()){            
             for (CyNode nodeIterator : centers) {
@@ -145,15 +190,17 @@ public class SourceDetection2 implements Runnable {
             j = 0;
             
         }
-        getNewRoot((centerss.get(centers.get(0).getSUID())),currentnetwork);
-        
+        return centerss;
     }
-    private static void getNewRoot( List<CyNode> subNetwork, CyNetwork currentnetwork){
+    private static CyNode getNewRoot( List<CyNode> subNetwork, CyNetwork currentnetwork){
         int infectedVal = 1;
         int f = 0;
-        
+        CyNode tmpnode = null;
+       if(subNetwork.size()==1){
+           return subNetwork.get(0);
+       }
         Set<CyNode> nodeWithValue = new HashSet<CyNode>(subNetwork);
-        JOptionPane.showMessageDialog(null, "Number of infected nodes are " + nodeWithValue.size());
+        //JOptionPane.showMessageDialog(null, "Number of infected nodes are " + nodeWithValue.size());
         Map<Long, List<CyNode>> received = new HashMap<Long, List<CyNode>>();
         Map<Long, List<CyNode>> signals = new HashMap<Long, List<CyNode>>();
         Map<Long, List<CyNode>> pending = new HashMap<Long, List<CyNode>>();
@@ -174,32 +221,32 @@ public class SourceDetection2 implements Runnable {
         while (f == 0) {
             //JOptionPane.showMessageDialog(null, "DB 1 : ");
             for (CyNode nodeIterator : nodeWithValue) {
-                //JOptionPane.showMessageDialog(null, "DB 2 : ");
+                 //JOptionPane.showMessageDialog(null, "nodeIt : " + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class));
                 for(CyNode signalIterator : signals.get(nodeIterator.getSUID())){
-                   // JOptionPane.showMessageDialog(null, "DB 3 : ");
+                   //  JOptionPane.showMessageDialog(null, "SignalIt : " + currentnetwork.getRow(signalIterator).get(CyNetwork.NAME, String.class));
                     for(CyNode neighborIterator : currentnetwork.getNeighborList(nodeIterator, CyEdge.Type.ANY)){
-                      // JOptionPane.showMessageDialog(null, "DB 4 : ");
-                        if(currentnetwork.getRow(neighborIterator).isSet("Infection")==true || nodeWithValue.contains(neighborIterator) ){
+                     // JOptionPane.showMessageDialog(null, "neighbor 1 : " + currentnetwork.getRow(neighborIterator).get(CyNetwork.NAME, String.class));
+                        if((currentnetwork.getRow(neighborIterator).isSet("Infection")==true) && (nodeWithValue.contains(neighborIterator) )){
                         pending.get(neighborIterator.getSUID()).add(signalIterator);
-                        JOptionPane.showMessageDialog(null, "node : " + currentnetwork.getRow(neighborIterator).get(CyNetwork.NAME, String.class)+ "pending list" 
-                        + currentnetwork.getRow(signalIterator).get(CyNetwork.NAME, String.class));
+                       // JOptionPane.showMessageDialog(null, "node : " + currentnetwork.getRow(neighborIterator).get(CyNetwork.NAME, String.class)+ "pending list" 
+                        //+ currentnetwork.getRow(signalIterator).get(CyNetwork.NAME, String.class));
                         }
                     }
                 }
-                JOptionPane.showMessageDialog(null, "DB 1 : ");
+                //JOptionPane.showMessageDialog(null, "DB 1 : ");
                 signals.get(nodeIterator.getSUID()).clear();
             }
             for(CyNode nodeIterator: nodeWithValue){
-                JOptionPane.showMessageDialog(null, "Node" + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class));
+                //JOptionPane.showMessageDialog(null, "Node" + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class));
                
                 for(CyNode pendingIterator : pending.get(nodeIterator.getSUID())){
                     
                     if(received.get(nodeIterator.getSUID()).contains(pendingIterator)){
-                    JOptionPane.showMessageDialog(null,"we have this node in rec.");
+                  //  JOptionPane.showMessageDialog(null,"we have this node in rec.");
                     }
                     else{
-                        JOptionPane.showMessageDialog(null, "Node:" + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class)
-                        +   " Has sig and rec " + currentnetwork.getRow(pendingIterator).get(CyNetwork.NAME, String.class));
+                    //    JOptionPane.showMessageDialog(null, "Node:" + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class)
+                      //  +   " Has sig and rec " + currentnetwork.getRow(pendingIterator).get(CyNetwork.NAME, String.class));
                         signals.get(nodeIterator.getSUID()).add(pendingIterator);
                         received.get(nodeIterator.getSUID()).add(pendingIterator);
                     }
@@ -207,20 +254,24 @@ public class SourceDetection2 implements Runnable {
                 }
                 
                 pending.get(nodeIterator.getSUID()).clear();
-                JOptionPane.showMessageDialog(null, "Node:" + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class)+"PEnding List deleted");
+               // JOptionPane.showMessageDialog(null, "Node:" + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class)+"PEnding List deleted");
                         
             }
             for(CyNode nodeIterator: nodeWithValue){
                 if(received.get(nodeIterator.getSUID()).size()==sizem){
                     JOptionPane.showMessageDialog(null, "root  : " + currentnetwork.getRow(nodeIterator).get(CyNetwork.NAME, String.class));
                     f=1;
-                    JOptionPane.showMessageDialog(null,"Algorithm Bitti");
+                    tmpnode = nodeIterator;
+                    return nodeIterator;
+                    
+                   // JOptionPane.showMessageDialog(null,"Algorithm Bitti");
                 }
                
                 
             }
             
         }
+        return tmpnode;
     }
     public void setStep(int stepcounter) {
         this.stepcounter = stepcounter;

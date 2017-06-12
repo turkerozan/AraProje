@@ -50,7 +50,7 @@ public class CyActivator extends AbstractCyActivator {
     public static CySwingAppAdapter adapter;
     @Override
     public void start(BundleContext context) throws Exception {
-        String version = new String("0.1");
+        String version = new String("1.0");
         this.appAdapter = getService(context, CyAppAdapter.class);
         this.networkViewManager = getService(context, CyNetworkViewManager.class);
         this.networkViewFactory = getService(context, CyNetworkViewFactory.class);
@@ -66,7 +66,7 @@ public class CyActivator extends AbstractCyActivator {
         this.vmfFactoryD = getService(context,VisualMappingFunctionFactory.class, "(mapping.type=discrete)");
         this.adapter = getService(context,CySwingAppAdapter.class);
   
-        menuaction = new ProjectMenuAction(cyApplicationManager, "AraProje " + version, this);
+        menuaction = new ProjectMenuAction(cyApplicationManager, "InformationAnalyzer " + version, this);
         //SpanningTreeStartMenu panel = new SpanningTreeStartMenu(this);
         //registerService(context, panel, CytoPanelComponent.class, new Properties());
         CyTableFactory tableFactory = getService(context,CyTableFactory.class);
